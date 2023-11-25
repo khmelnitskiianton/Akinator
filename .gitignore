@@ -11,5 +11,7 @@ CTestTestfile.cmake
 _deps
 
 log/
-tree.exe
-output.txt
+akinator.exe
+data.txt
+save_data.txt
+show_graph.png

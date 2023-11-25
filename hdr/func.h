@@ -3,10 +3,14 @@
 
 #include "errors_enum.h"
 
-const size_t SIZE_OF_BUFFER = 3000;
+const size_t SIZE_OF_BUFFER = 500;
 const int DONE = 1;
 const int ERROR = 0;
 const char UNKNOWN_OBJECT[] = "неизвестно кто"; 
+
+#define SHOW_GRAPH_FILE "show_graph.dot"
+#define SHOW_GRAPH_IMAGE "show_graph.png"
+#define SHOW_GRAPH_TYPE "png"
 
 struct Line {
     size_t len;
@@ -19,7 +23,7 @@ void         TreeCtor   (BinaryTree_t* myTree);
 EnumOfErrors TreeDtor   (BinaryTree_t* myTree);
 void         InitNode   (Node_t* NewNode);
 void         RecFree    (Node_t* CurrentNode);
-//size_t       FileSize   (FILE *file_text);
+size_t       FileSize   (FILE *file_text);
 //---------------------------------------------
 
 //Интерфейс
@@ -56,8 +60,15 @@ void PrintPostNode (Node_t* CurrentNode, FILE* filestream);
 //-------------------------------------------------------------------
 
 //Подгрузка базы данных
-//EnumOfErrors UploadDataBase (BinaryTree_t* myTree);
+EnumOfErrors UploadDataBase (BinaryTree_t* myTree, const char* file_database);
+EnumOfErrors RecScanData(const char* text_buffer, bool LeftRight, Node_t* CurrentNode, BinaryTree_t* myTree);
+size_t SkipSpaces(size_t position, const char* text_buffer);
+//--------------------------------------------------------------------------------------
 
-//------------------------------------------------------------
+//Показать дерево
+void ShowTree (BinaryTree_t* myTree);
+void ShowWriteNode (Node_t* CurrentNode);
+//use openfile closefile 
+//---------------------------------------------------------------------------------------
 
 #endif

@@ -38,8 +38,8 @@ int main(int argc, char *argv[])
     if (choice == 'Y')
     {
         fprintf(stdout, GREEN "Загрузка базы данных...\n" RESET);
-        //UploadDataBase(&myTree);
-        fprintf(stdout, GREEN "Загрузка базы данных завершена!\n" RESET);
+        UploadDataBase(&myTree, argv[1]);
+        fprintf(stdout, GREEN "Загрузка базы данных завершена!\n\n" RESET);
     }   
 
 //Подгрузка БД

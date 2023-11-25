@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 #include "colors.h"
 #include "tree.h"
@@ -13,18 +15,15 @@
 #include "stack_base.h"
 #include "stack_support.h"
 
+static FILE* ShowGraphFile = NULL;
+static size_t position = 0;
+
 void TreeCtor (BinaryTree_t* myTree)
 {
     MYASSERT(myTree, ERR_BAD_POINTER_TREE, return)
 
-    Node_t* FirstNode = (Node_t*) calloc (1,sizeof (Node_t));
-    InitNode (FirstNode);
-    MYASSERT(FirstNode, ERR_BAD_CALLOC, return)
-
-    strcpy(FirstNode->Value, UNKNOWN_OBJECT);
-
-    myTree->Root = FirstNode;
-    myTree->Size = 1;
+    myTree->Root = NULL;
+    myTree->Size = 0;
 }
 
 EnumOfErrors TreeDtor (BinaryTree_t* myTree)
@@ -102,7 +101,7 @@ EnumOfErrors TreePostOrder (BinaryTree_t* myTree, FILE* filestream)
 
 void PrintPreNode (Node_t* CurrentNode, FILE* filestream)
 {
-    if (!CurrentNode) {fprintf(filestream, " [nil] "); return;}
+    if (!CurrentNode) {fprintf(filestream, " nil "); return;}
     fprintf(filestream, "(");
 
     fprintf(filestream, " [" SPECIFIER "] ", CurrentNode->Value);
@@ -114,7 +113,7 @@ void PrintPreNode (Node_t* CurrentNode, FILE* filestream)
 
 void PrintInNode (Node_t* CurrentNode, FILE* filestream)
 {
-    if (!CurrentNode) {fprintf(filestream, " [nil] "); return;}
+    if (!CurrentNode) {fprintf(filestream, " nil "); return;}
     fprintf(filestream, "(");
 
     PrintInNode(CurrentNode->Left, filestream);
@@ -126,7 +125,7 @@ void PrintInNode (Node_t* CurrentNode, FILE* filestream)
 
 void PrintPostNode (Node_t* CurrentNode, FILE* filestream)
 {
-    if (!CurrentNode) {fprintf(filestream, " [nil] "); return;}
+    if (!CurrentNode) {fprintf(filestream, " nil "); return;}
     fprintf(filestream, "(");
 
     PrintPostNode(CurrentNode->Left, filestream);
@@ -183,6 +182,7 @@ EnumOfErrors RecGuess (Node_t* CurrentNode, BinaryTree_t* myTree)
             MYASSERT(NewObjectNode, ERR_BAD_CALLOC, return ERR_BAD_CALLOC)
             InitNode(NewObjectNode);
             myTree->Size++;
+
             Node_t* NewFeatureNode = (Node_t*) calloc (1,sizeof (Node_t));        //создали новую особенность
             MYASSERT(NewFeatureNode, ERR_BAD_CALLOC, return ERR_BAD_CALLOC)
             InitNode(NewFeatureNode);
@@ -273,7 +273,6 @@ const char* SelectOption (void)
         if (!strncmp(buff, "В", 2) || !strncmp(buff, "в", 2)) break;
         if (!strncmp(buff, "Б", 2) || !strncmp(buff, "б", 2)) break;
         fprintf (stdout,  RED "Я не понял команду :(\n" RESET);
-        clean_buffer();
         CleanCharBuffer(buff, SIZE_OF_BUFFER);
         fgets(buff, SIZE_OF_BUFFER, stdin);
     }
@@ -293,7 +292,15 @@ EnumOfErrors AkinatorWork(BinaryTree_t* myTree, Stack_t* StackObject1, Stack_t* 
     MYASSERT(StackObject1, ERR_BAD_POINTER_STACK, return ERR_BAD_POINTER_STACK)
     MYASSERT(StackObject2, ERR_BAD_POINTER_STACK, return ERR_BAD_POINTER_STACK)
 
-    FILE* FileWrite = OpenFile(file_database, "w");
+    if (!myTree->Root)  //если бд пустая то добавляем неизвестно кто
+    {
+        Node_t* FirstNode = (Node_t*) calloc (1,sizeof (Node_t));
+        InitNode (FirstNode);
+        MYASSERT(FirstNode, ERR_BAD_CALLOC, return ERR_BAD_CALLOC)
+        strcpy(FirstNode->Value, UNKNOWN_OBJECT);
+        myTree->Root = FirstNode;
+        myTree->Size++;
+    }
 
     fprintf(stdout, CYAN "Привет я Акинатор!\nТы можешь загадать объект а я его отгадаю!\n" RESET);
     const char* result = SelectOption ();
@@ -311,16 +318,21 @@ EnumOfErrors AkinatorWork(BinaryTree_t* myTree, Stack_t* StackObject1, Stack_t* 
         {
             CompareObjects(myTree, StackObject1, StackObject2);
         }
+        if (!strncmp (result, "П", 2))
+        {
+            ShowTree(myTree);
+        }
         result = SelectOption();
     }
 
     if (!strncmp(result, "В", 2))
     {
+        FILE* FileWrite = OpenFile(file_database, "w");
         fprintf(stdout, GREEN "Сохраняю базу данных...\n" RESET);
         TreePreOrder(myTree, FileWrite);
         fprintf(stdout, GREEN "Сохранение завершено!\n\n" RESET);
+        CloseFile (FileWrite);
     }
-    CloseFile (FileWrite);
     fprintf (stdout, GREEN "Всего хорошего!\n" RESET);
     return ERR_OK;
 }
@@ -553,56 +565,185 @@ void RecPrintComparing (Stack_t* StackObject1, Stack_t* StackObject2, Node_t* Cu
     }
 }
 
-// EnumOfErrors UploadDataBase (BinaryTree_t* myTree, const char* file_database)
-// {
-//     FILE* FileRead = OpenFile (file_database);
+EnumOfErrors UploadDataBase (BinaryTree_t* myTree, const char* file_database)
+{
+    MYASSERT(myTree, ERR_BAD_POINTER_TREE, return ERR_BAD_POINTER_TREE)
+    MYASSERT(file_database, ERR_WHAT_FILE_OF_DATA, return ERR_WHAT_FILE_OF_DATA)
 
-//     size_t size_text = FileSize (FileRead);
-//     size_t n_strings = 0;
-//     size_t good_strings = 0;
+    FILE* FileRead = OpenFile (file_database, "r");
 
-//     char* text_buffer = NULL;
-//     text_buffer = (char*) calloc (size_text + 1, sizeof (char));
-//     MYASSERT(text_buffer, ERR_BAD_CALLOC, return ERR_BAD_CALLOC)
-//     size_t result = fread (text_buffer, 1, size_text, FileRead);
-// 	MYASSERT(result == (size_text - 1), ERR_BAD_IN_READ_FILE, return ERR_BAD_IN_READ_FILE)
-// 	*(text_buffer + size_text - 1) = '\0';
+    size_t size_text = FileSize (FileRead);
+    size_t n_strings = 0;
 
-//     n_strings = 0;
-// 	for (size_t i = 0; i < (size_text); i++)
-//     {
-//         if ((*(text_buffer + i) == '[') || (*(text_buffer + i) == '\0'))
-//         {
-//             n_strings += 1;
-//         }
-//     }
-// 	Line* string_buffer = NULL;
-// 	string_buffer = (Line*) calloc (n_strings + 1, sizeof (Line));
-//     MYASSERT(string_buffer, ERR_BAD_CALLOC, return ERR_BAD_CALLOC)
+    char* text_buffer = NULL;
+    text_buffer = (char*) calloc (size_text, sizeof (char));
+    MYASSERT(text_buffer, ERR_BAD_CALLOC, return ERR_BAD_CALLOC)
+    fread (text_buffer, 1, size_text, FileRead);
 
-//     size_t shift_buffer = 0;
-//     size_t counter_string = 0;
+    if (*text_buffer == '\0') 
+    {
+        fprintf(stdout, YELLOW "База данных пуста!\n" RESET);
+        return ERR_OK;
+    }
 
-//     while (*(text_buffer + shift_buffer) == '\0')
-//     {
-//         if (*(text_buffer + shift_buffer) == '[')
-//         {
-               
-//             counter_string++;
-//         }
-//     }
+	*(text_buffer + size_text - 1) = '\0';
+    CloseFile (FileRead);
 
+    n_strings = 0; //считаем узлы
+	for (size_t i = 0; i < (size_text); i++)
+    {
+        if ((*(text_buffer + i) == '[') || (*(text_buffer + i) == '\0'))
+        {
+            n_strings += 1;
+        }
+    }
 
-//     CloseFile (FileRead);
-//     return ERR_OK;   
-// }
+    RecScanData(text_buffer, 0, myTree->Root, myTree);
 
-// size_t FileSize (FILE *file_text)
-// {
-//     MYASSERT(file_text, ERR_BAD_POINTER_FILE, return 0)
-// 	struct stat st;
-//     int fd = fileno (file_text); 
-//     fstat (fd, &st);
-//     size_t size_text = st.st_size;
-// 	return size_text;
-// }
+    free(text_buffer);
+
+    return ERR_OK;   
+}
+
+size_t FileSize (FILE *file_text)
+{
+    MYASSERT(file_text, ERR_BAD_POINTER_FILE, return 0)
+	struct stat st;
+    int fd = fileno (file_text); 
+    fstat (fd, &st);
+    size_t size_text = (size_t) st.st_size;
+	return size_text;
+}
+
+EnumOfErrors RecScanData(const char* text_buffer, bool LeftRight, Node_t* CurrentNode, BinaryTree_t* myTree)
+{
+    position = SkipSpaces (position, text_buffer); //пропускаем пробелы
+    if (!strncmp(text_buffer + position, "nil", 3))
+    {
+        //дальше поддерево - пустота
+        position = position + 3;
+        position = SkipSpaces (position, text_buffer);
+        return ERR_OK;
+    }
+
+    //нашли открывающуюся скобочку
+    if (*(text_buffer + position) == '(')
+    {
+        position++;
+        position = SkipSpaces (position, text_buffer); //пропускаем пробелы
+        //пытаемся считать значение
+        MYASSERT(*(text_buffer + position) == '[', ERR_NO_OPEN_BRACKET_OBJ, return ERR_NO_OPEN_BRACKET_OBJ)
+        position++; //было на [ станет на первой букве
+        
+        char object_buffer[SIZE_OF_BUFFER] = {};
+        Node_t* NewNode = (Node_t*) calloc (1, sizeof (Node_t));        //создали новый объект
+        MYASSERT(NewNode, ERR_BAD_CALLOC, return ERR_BAD_CALLOC)
+        InitNode(NewNode);
+        myTree->Size++;
+
+        size_t shift = 0;
+        while (*(text_buffer + position) != ']') 
+        {
+            *(object_buffer + shift) = *(text_buffer + position);
+            shift++;
+            position++;
+        }
+        MYASSERT((strlen(object_buffer) + 1) < SIZE_OF_VALUE, ERR_OVERFLOW_VALUE, return ERR_OVERFLOW_VALUE)
+        strcpy(NewNode->Value, object_buffer);     
+        CleanCharBuffer(object_buffer, SIZE_OF_BUFFER);
+        position++;
+        position = SkipSpaces (position, text_buffer);
+        //считали значение
+        NewNode->Parent = CurrentNode;//подвязка от предыдущего
+        if (CurrentNode)//проверка на корень
+        {
+            if (LeftRight == 0) CurrentNode->Left = NewNode;
+            else                CurrentNode->Right = NewNode;
+        }
+        else
+        {
+            myTree->Root = NewNode;
+        }
+        //Далее рекурсивно идем дальше
+        EnumOfErrors result = ERR_OK;
+        result = RecScanData(text_buffer, 0, NewNode, myTree);
+        MYASSERT(result == ERR_OK, ERR_BAD_REC_SCAN, return ERR_BAD_REC_SCAN);
+        result = RecScanData(text_buffer, 1, NewNode, myTree);
+        MYASSERT(result == ERR_OK, ERR_BAD_REC_SCAN, return ERR_BAD_REC_SCAN);
+        position = SkipSpaces (position, text_buffer);
+        if (*(text_buffer + position) == ')')
+        {
+            position++;
+            return ERR_OK;
+        }
+        else
+        {
+            MYASSERT(0, ERR_NO_CLOSE_BRACKET_NODE, return ERR_NO_CLOSE_BRACKET_NODE)
+        }
+    }
+    else
+    {
+        MYASSERT(0, ERR_NO_OPEN_BRACKET_NODE, return ERR_NO_OPEN_BRACKET_NODE)
+    }
+}
+
+size_t SkipSpaces(size_t current_position, const char* text_buffer)
+{
+    size_t end_position = current_position;
+    MYASSERT(text_buffer, ERR_BAD_POINTER_DATA, return 0)
+    while (*(text_buffer + end_position) == ' ') { end_position++; }
+    return end_position;
+}
+
+void ShowTree (BinaryTree_t* myTree)
+{
+    system("touch " SHOW_GRAPH_FILE);
+
+    ShowGraphFile = OpenFile(SHOW_GRAPH_FILE, "w");
+
+    fprintf (ShowGraphFile, "digraph G{\n"
+                            "rankdir = TB;\n"
+                            "bgcolor = \"" FILL_BACK_COLOR "\";\n"
+                            "node[color = \"" COLOR_FRAME "\", fontsize = 10];\n"
+                            "edge[color = \"" COLOR_FRAME "\", fontsize = 15];\n"
+
+                            "subgraph cluster_list {\n"
+                            "\tnode[style = filled, fontsize = 10];\n"
+                            "\tedge[color = \"" COLOR_FRAME "\", fontsize = 15];\n"
+                            "\tstyle = \"dashed\";\n"
+                            "\tcolor = \"" COLOR_STIPPLE "\";\n");
+
+    if (!(myTree->Root)) 
+    {
+        return;
+    }
+    else
+    {
+        ShowWriteNode (myTree->Root);
+    }
+    fprintf (ShowGraphFile,     "}\n");
+    fprintf (ShowGraphFile,     "}\n");
+    CloseFile(ShowGraphFile);
+
+    system ("dot " SHOW_GRAPH_FILE " -T " SHOW_GRAPH_TYPE " -o " SHOW_GRAPH_IMAGE);
+    system ("rm " SHOW_GRAPH_FILE);
+}
+
+void ShowWriteNode (Node_t* CurrentNode)
+{
+    fprintf (ShowGraphFile, "\tnode%p [shape = Mrecord, style = filled, fillcolor = \"" FILL_BACK_GRAPH "\", color = \"" COLOR_FRAME "\", label = \"" SPECIFIER "\"];\n"
+            ,CurrentNode, CurrentNode->Value);
+    
+    if (CurrentNode->Left)
+    {
+        ShowWriteNode (CurrentNode->Left);
+        fprintf (ShowGraphFile, "\tnode%p -> node%p [color = \"" COLOR_EDGE_GRAPH "\", label = \"нет\"]\n"
+                , CurrentNode, CurrentNode->Left);
+    }
+    if (CurrentNode->Right)
+    {
+        ShowWriteNode (CurrentNode->Right);
+        fprintf (ShowGraphFile, "\tnode%p -> node%p [color = \"" COLOR_EDGE_GRAPH "\", label = \"да\"]\n"
+                , CurrentNode, CurrentNode->Right);
+    }
+}
