@@ -228,18 +228,18 @@ int output_error (Stack_t *stk, const char* file, const size_t line, const char*
     unsigned long bin_error = 0;
     int element = 0;
     int fatal_error = 0;
-    printf("<<<<<!!!!YOU HAVE ERROR.CHECK OUTPUT.TXT OR TERMINAL!!!!>>>>>>>\n");
+    printf("<<<<<!!!!YOU HAVE ERROR.CHECK ./log/log_stack.txt OR TERMINAL!!!!>>>>>>>\n");
     if (z == 1)
     {
         printf("\n<<<<<<<<<<<<<<<YOU HAVE ERROR>>>>>>>>>>>>>>>>>\n"
-            "Stack[%p] called from %s (string: %lu) in function %s\n"
+            "Stack_t[%p] called from %s (string: %lu) in function %s\n"
             "1: [%s]\n", stk, file, line, pretty_function,mass_of_errors[0]);
         abort();
     }
     if (z == 2)
     {
         printf("\n<<<<<<<<<<<<<<<YOU HAVE ERROR>>>>>>>>>>>>>>>>>\n"
-            "Stack[%p] called from %s (string: %lu) in function %s\n"
+            "Stack_t[%p] called from %s (string: %lu) in function %s\n"
             "0: [OK]\n"
             "1: [%s]\n", stk, file, line, pretty_function,mass_of_errors[1]);
         abort();
@@ -267,7 +267,7 @@ int output_error (Stack_t *stk, const char* file, const size_t line, const char*
     
     if (!fatal_error)
     {
-    fprintf (stk -> file_write,"Stack[%p] called from %s (string: %lu) in function %s\n"
+    fprintf (stk -> file_write,"Stack_t[%p] called from %s (string: %lu) in function %s\n"
     //      "\t\t%s             \n"
             "{                  \n"
             "\tsize        = %d \n"
@@ -294,7 +294,7 @@ int output_error (Stack_t *stk, const char* file, const size_t line, const char*
     return 1;
 }
 
-int printing_stack (Stack* stk, const char* file, const size_t line, const char* pretty_function)
+int printing_stack (Stack_t* stk, const char* file, const size_t line, const char* pretty_function)
 {
     fprintf (stk -> file_write,"\nStack[%p] called from %s (string: %lu) in function %s\n"
             "{                  \n"
@@ -330,7 +330,7 @@ int degree(int a, int b)
 }
 
 ON_CANARY(
-Canary_t* ptr_r_canary_data (Stack* stk)                                                                                                    
+Canary_t* ptr_r_canary_data (Stack_t* stk)                                                                                                    
 {                                                                                                                                           
     Canary_t* ptr = (Canary_t*)((char*)((stk -> data) + (stk -> capacity))+((stk -> capacity)*sizeof(StackElem_t)) % sizeof(Canary_t));          
     stk -> r_canary_data = ptr;                                                                                                             
@@ -360,7 +360,7 @@ Hash_t MYHashFAQ6(const char * str, size_t size)
     return hash;
 }
 
-size_t size_data (Stack* stk)
+size_t size_data (Stack_t* stk)
 {
 ON_CANARY_IF(
     return sizeof(Canary_t)*2 + sizeof(StackElem_t)*(stk -> capacity) + ((stk -> capacity)*sizeof(StackElem_t)) % sizeof(Canary_t);
@@ -387,7 +387,7 @@ int file_close (FILE *file_text)
     return 1;
 }
 ON_HASH(
-int rewrite_hash (Stack* stk, const char* ptr)
+int rewrite_hash (Stack_t* stk, const char* ptr)
 {
     stk -> hash_struct = 0;
     stk -> hash_data = hash_func(ptr, size_data(stk));

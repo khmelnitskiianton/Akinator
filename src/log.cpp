@@ -22,7 +22,7 @@ void _PrintLogStart (void)
         system("touch " FILE_LOG);
     }
 
-    FileLog = OpenFile (FILE_LOG);
+    FileLog = OpenFile (FILE_LOG, "w");
 
     fprintf(FileLog,    "<!DOCTYPE html>\n"
                         "<html lang=\"eng\">\n"
@@ -86,7 +86,7 @@ void _PrintLogTree (BinaryTree_t* myTree, const char* file,  const char* functio
 
 void GenerateGraph (BinaryTree_t* myTree)
 {
-    FileGraph = OpenFile(FILE_GRAPH);
+    FileGraph = OpenFile(FILE_GRAPH, "w");
 
     fprintf (FileGraph,     "digraph G{\n"
                             "rankdir = TB;\n"
@@ -113,18 +113,18 @@ void GenerateGraph (BinaryTree_t* myTree)
 
 FILE* GenerateImage (void)
 {
-    FILE* pPipe = popen ("dot " FILE_GRAPH " -T " TYPE_OF_IMAGE, "r");
+    FILE* pPipe = popen ("dot " FILE_GRAPH  " -T " TYPE_OF_IMAGE, "r");
     MYASSERT(pPipe, ERR_BAD_OPEN_FILE, )
     return pPipe;
 }
 
-FILE* OpenFile (const char* file_text)
+FILE* OpenFile (const char* file_open, const char* option)
 {
-    FILE *file_write = fopen (file_text, "w");
+    FILE *FileOpen = fopen (file_open, option);
 
-    MYASSERT(file_write, OPEN_FILE, return 0);
+    MYASSERT(FileOpen, OPEN_FILE, return 0);
 
-    return file_write;
+    return FileOpen;
 }
 
 void CloseFile (FILE* file_text)
@@ -162,7 +162,7 @@ void WriteNode (Node_t* CurrentNode)
     else
     {
         NullNodes++;
-        WriteNullNode ("<f0>", CurrentNode);
+        //WriteNullNode ("<f0>", CurrentNode);
     }
     if (CurrentNode->Right)
     {
@@ -172,7 +172,7 @@ void WriteNode (Node_t* CurrentNode)
     else
     {
         NullNodes++;
-        WriteNullNode ("<f1>", CurrentNode);
+        //WriteNullNode ("<f1>", CurrentNode);
     }
 }
 

@@ -1,4 +1,4 @@
-#ifndef HEAD_H
+#ifndef STAC_MAIN_H
 #define HEAD_H
 
 //TODO: sanitizer call if canary or hash

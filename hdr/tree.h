@@ -4,7 +4,7 @@
 #include "element.h"
 
 struct Node {
-    Elem_t       Value;
+    Elem_t       Value[SIZE_OF_VALUE];
     struct Node* Right;
     struct Node* Left;
     struct Node* Parent;

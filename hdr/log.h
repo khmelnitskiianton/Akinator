@@ -27,7 +27,7 @@ void  WriteNode      (Node_t* CurrentNode);
 void  WriteNullNode  (const char* Place, Node_t* CurrentNode);
 void  WriteHead      (BinaryTree_t* myTree);
 void  WriteTree      (BinaryTree_t* myTree);
-FILE* OpenFile       (const char* file_text);
+FILE* OpenFile       (const char* file_open, const char* option);
 void  CloseFile      (FILE* file_text);
 
 #define FOLDER_LOG "log"

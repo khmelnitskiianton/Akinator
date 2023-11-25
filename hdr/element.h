@@ -3,8 +3,8 @@
 
 #include <limits.h>
 
-typedef char* Elem_t;
+typedef char Elem_t;
 #define SPECIFIER "%s"
-constexpr Elem_t POISON_ELEMENT = "nil";
+const size_t SIZE_OF_VALUE = 150;
  
 #endif

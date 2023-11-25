@@ -4,45 +4,52 @@
 
 #include "colors.h"
 #include "tree.h"
+#include "stack_main.h"
 #include "log.h"
 #include "func.h"
 #include "myassert.h"
-#include "stack_main.h"
 #include "stack_base.h"
+#include "stack_support.h"
 
 int main(int argc, char *argv[])
 {
     setlocale(LC_ALL, "Russian");
-    BinaryTree_t myTree = {};
-    
-    FILE* filestream = NULL;
-
     if (argc == 2)
     {
-        printf(GREEN "\n<<<FILE TO PRINT TREE: %s>\n\n" RESET, argv[1]);
-        filestream = OpenFile(argv[1]);
+        printf(GREEN "\n<<<Файл для сохранения базы данных: %s>\n" RESET, argv[1]);
     }
 
-    Stack_t myStack = {};
-    StackCtor (&myStack);
+    fprintf(stdout, GREEN "\nЗагрузка...\n" RESET);
+
+    BinaryTree_t myTree = {};
+    Stack_t StackObject1 = {};    
+    Stack_t StackObject2 = {};
 
     TreeCtor (&myTree);
+    StackCtor (&StackObject1);
+    StackCtor (&StackObject2);
     PrintLogStart();
     PrintLogTree (&myTree);
 
+    fprintf(stdout, GREEN "Загрузка завершена!\n\n" RESET);
+
+    fprintf(stdout, GREEN "Загрузить старую базу данных?\n" RESET);
+    int choice = UserChoice();
+    if (choice == 'Y')
+    {
+        fprintf(stdout, GREEN "Загрузка базы данных...\n" RESET);
+        //UploadDataBase(&myTree);
+        fprintf(stdout, GREEN "Загрузка базы данных завершена!\n" RESET);
+    }   
+
 //Подгрузка БД
 
-    Guess(&myTree);
-    Guess(&myTree);
-
-    TreePreOrder(&myTree, filestream);
-    TreeInOrder(&myTree, filestream);
-    TreePostOrder(&myTree, filestream);
+    AkinatorWork(&myTree, &StackObject1, &StackObject2, argv[1]);
 
     PrintLogFinish();
-    StackDtor (&myStack);
+    StackDtor (&StackObject1);
+    StackDtor (&StackObject2);
     TreeDtor (&myTree);
-    CloseFile(filestream);
     printf(GREEN "\n<<<GOOD ENDING>>>\n\n" RESET);
     return 0;   
 }
