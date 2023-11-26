@@ -32,14 +32,16 @@ int main(int argc, char *argv[])
     PrintLogTree (&myTree);
 
     fprintf(stdout, GREEN "Загрузка завершена!\n\n" RESET);
-
+    
     fprintf(stdout, GREEN "Загрузить старую базу данных?\n" RESET);
+    system(ECHO "Загрузить старую базу данных?" FESTIVAL);
     int choice = UserChoice();
     if (choice == 'Y')
     {
         fprintf(stdout, GREEN "Загрузка базы данных...\n" RESET);
         UploadDataBase(&myTree, argv[1]);
         fprintf(stdout, GREEN "Загрузка базы данных завершена!\n\n" RESET);
+        system(ECHO "Загрузка базы данных завершена!" FESTIVAL);
     }   
 
 //Подгрузка БД

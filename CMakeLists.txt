@@ -8,7 +8,7 @@ include_directories(./hdr)
 
 set(PREF_SRC "./src")
 set(PREF_HDR "./hdr")
-
+ 
 FILE(GLOB SRC ${PREF_SRC}/*.cpp)
 FILE(GLOB HDR ${PREF_HDR}/*.h)
 

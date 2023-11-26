@@ -141,6 +141,9 @@ EnumOfErrors Guess (BinaryTree_t* myTree)
     MYASSERT(myTree->Root, ERR_ROOT_NULL, return ERR_ROOT_NULL)
 
     fprintf(stdout, CYAN "Давай я попробую отгадать:\n" RESET);
+ON_FESTIVAL( 
+    system(ECHO "\"Давай я попробую отгадать\"" FESTIVAL);
+)
     EnumOfErrors result = RecGuess(myTree->Root, myTree);
     PrintLogTree (myTree);
     return result;
@@ -152,7 +155,12 @@ EnumOfErrors RecGuess (Node_t* CurrentNode, BinaryTree_t* myTree)
     //Определяем перед нами объект или определение? У определения два узла: нн или объект или определение
     if (CurrentNode->Left && CurrentNode->Right)    //если определение
     {
-        fprintf(stdout, CYAN "Это %s ?\n" RESET, CurrentNode->Value);
+        fprintf(stdout, CYAN "Это %s?\n" RESET, CurrentNode->Value);
+ON_FESTIVAL(        
+        char festival1_buffer[SIZE_OF_FESTIVAL] = {};
+        snprintf(festival1_buffer, SIZE_OF_FESTIVAL, ECHO "\"Это %s?\"" FESTIVAL, CurrentNode->Value);
+        system(festival1_buffer);
+)
         int choice = UserChoice();
         if (choice == 'Y')
         {
@@ -167,10 +175,18 @@ EnumOfErrors RecGuess (Node_t* CurrentNode, BinaryTree_t* myTree)
     if (!CurrentNode->Left && !CurrentNode->Right)                //Добрались до объекта типа
     {
         fprintf(stdout, CYAN "Это %s ?\n" RESET, CurrentNode->Value);
+ON_FESTIVAL( 
+        char festival2_buffer[SIZE_OF_FESTIVAL] = {};
+        snprintf(festival2_buffer, SIZE_OF_FESTIVAL, ECHO "\"Это %s?\"" FESTIVAL, CurrentNode->Value);
+        system(festival2_buffer);
+)
         int choice = UserChoice();
         if (choice == 'Y')
         {
-            fprintf(stdout, GREEN "Я же говорила!\n" RESET); //отгадали
+            fprintf(stdout, GREEN "Я же говорил!\n" RESET); //отгадали
+    ON_FESTIVAL( 
+            system(ECHO "\"Я же говорил!\"" FESTIVAL);
+    )        
             return ERR_OK;
         }
         else if (choice == 'N')          //нет, значит новый объект + новое отличие
@@ -208,6 +224,9 @@ EnumOfErrors RecGuess (Node_t* CurrentNode, BinaryTree_t* myTree)
             //Заполняем новые данные по объекту и отличию
             //объект
             fprintf(stdout, CYAN "А кто же это был?\n" RESET);
+    ON_FESTIVAL( 
+            system(ECHO "\"А кто же это был?\"" FESTIVAL);
+    )
             int buff_ch = 0; 
             size_t counter_symbols = 0;
             
@@ -224,7 +243,11 @@ EnumOfErrors RecGuess (Node_t* CurrentNode, BinaryTree_t* myTree)
             CleanCharBuffer(buffer, SIZE_OF_BUFFER);
             //отличие
             fprintf(stdout, CYAN "А чем %s отличается от %s ?\nЭто..." RESET, NewObjectNode->Value, CurrentNode->Value); //Создаем новое определение
-            
+    ON_FESTIVAL(         
+            char festival3_buffer[SIZE_OF_FESTIVAL] = {};
+            snprintf(festival3_buffer, SIZE_OF_FESTIVAL, ECHO "\"А чем %s отличается от %s Это\"" FESTIVAL, NewObjectNode->Value, CurrentNode->Value);
+            system(festival3_buffer);
+    )        
             while ((buff_ch = getchar()) != '\n') 
             {
                 buffer[counter_symbols] = buff_ch;
@@ -236,6 +259,9 @@ EnumOfErrors RecGuess (Node_t* CurrentNode, BinaryTree_t* myTree)
             CleanCharBuffer(buffer, SIZE_OF_BUFFER);       
             PrintLogTree(myTree);
             fprintf(stdout, CYAN "Я запомнил!!!\n" RESET);
+    ON_FESTIVAL( 
+            system(ECHO "\"Я запомнил!\"" FESTIVAL);
+    )
             return ERR_OK;
         }
     }
@@ -251,6 +277,9 @@ int UserChoice (void)
     {
         if ((strncmp(buff, "Д", 2) == 0) || (strncmp(buff, "д", 2) == 0)) break;
         fprintf (stdout, RED "Ты шо крейзи? Вводи Да или Нет !!!\n" RESET);
+    ON_FESTIVAL( 
+        system(ECHO "\"Ты шо крейзи Вводи Да или Нет\"" FESTIVAL);
+    )
         CleanCharBuffer(buff, SIZE_OF_BUFFER);
         fgets(buff, SIZE_OF_BUFFER, stdin);
     }
@@ -261,6 +290,9 @@ int UserChoice (void)
 const char* SelectOption (void)
 {
     fprintf(stdout, CYAN "Что ты хочешь?: [У]гадать, [Д]ать определение, [С]равнить объекты,\n\t\t[П]оказать дерево, [В]ыйти с сохранением или [Б]ез сохранения.\n" RESET);
+ON_FESTIVAL(     
+    system(ECHO "\"Что ты хочешь?\"" FESTIVAL);
+)
     char buff[SIZE_OF_BUFFER] = {};
     fgets(buff, SIZE_OF_BUFFER, stdin);
     buff[strlen(buff)-1] = '\0';
@@ -303,6 +335,9 @@ EnumOfErrors AkinatorWork(BinaryTree_t* myTree, Stack_t* StackObject1, Stack_t* 
     }
 
     fprintf(stdout, CYAN "Привет я Акинатор!\nТы можешь загадать объект а я его отгадаю!\n" RESET);
+ON_FESTIVAL( 
+    system(ECHO "\"Привет я Акинатор Ты можешь загадать объект а я его отгадаю!\"" FESTIVAL);
+)    
     const char* result = SelectOption ();
     while (strncmp (result, "В", 2) && strncmp (result, "Б", 2))
     {
@@ -329,11 +364,20 @@ EnumOfErrors AkinatorWork(BinaryTree_t* myTree, Stack_t* StackObject1, Stack_t* 
     {
         FILE* FileWrite = OpenFile(file_database, "w");
         fprintf(stdout, GREEN "Сохраняю базу данных...\n" RESET);
+    ON_FESTIVAL(     
+        system(ECHO "\"Сохраняю базу данных\"" FESTIVAL);    
+    )    
         TreePreOrder(myTree, FileWrite);
         fprintf(stdout, GREEN "Сохранение завершено!\n\n" RESET);
+    ON_FESTIVAL( 
+        system(ECHO "\"Сохранение завершено!\"" FESTIVAL);
+    )    
         CloseFile (FileWrite);
     }
     fprintf (stdout, GREEN "Всего хорошего!\n" RESET);
+ON_FESTIVAL( 
+    system(ECHO "\"Всего хорошего\"" FESTIVAL); 
+)    
     return ERR_OK;
 }
 
@@ -370,6 +414,9 @@ EnumOfErrors Definition (BinaryTree_t* myTree, Stack_t* StackObject)
     int object_ch = 0;
     size_t counter_symbols = 0;
     fprintf(stdout, CYAN "Введите объект и я выведу вам его определение: " RESET);
+ON_FESTIVAL( 
+    system(ECHO "\"Введите объект и я выведу вам его определение\"" FESTIVAL); 
+)
     while ((object_ch = getchar()) != '\n') 
     {
         object_buffer[counter_symbols] = object_ch;
@@ -382,6 +429,9 @@ EnumOfErrors Definition (BinaryTree_t* myTree, Stack_t* StackObject)
     if (!find_node)
     {
         fprintf(stdout, YELLOW "Ваш объект не найден, убедитесь что вы правильно его ввели!\n");
+    ON_FESTIVAL(     
+        system(ECHO "\"Ваш объект не найден убедитесь что вы правильно его ввели\"" FESTIVAL);
+    )
         return ERR_OK;
     }
     //нашли узел теперь идем к корню и заполняем стек
@@ -439,8 +489,14 @@ EnumOfErrors RecReturn(Node_t* PreviousNode, Node_t* CurrentNode, Stack_t* Stack
 void PrintDefinition (Stack_t* StackObject, BinaryTree_t* myTree)
 {
     fprintf(stdout, GREEN "Это: ");
+ON_FESTIVAL(
+    system(ECHO "\"Это\"" FESTIVAL);
+)
     RecPrintDef(StackObject, myTree->Root);
-    fprintf(stdout, "все!\n" RESET);   
+    fprintf(stdout, "всё!\n" RESET);
+ON_FESTIVAL(  
+    system(ECHO "\"всё\"" FESTIVAL);   
+)
 }
 
 void RecPrintDef (Stack_t* StackObject, Node_t* CurrentNode)
@@ -453,11 +509,21 @@ void RecPrintDef (Stack_t* StackObject, Node_t* CurrentNode)
     if (selection == 0) 
     {
         fprintf(stdout, "не %s, ", CurrentNode->Value);
+    ON_FESTIVAL(
+        char festival1_buffer[SIZE_OF_FESTIVAL] = {};
+        snprintf(festival1_buffer, SIZE_OF_FESTIVAL, ECHO "\"не %s\"" FESTIVAL, CurrentNode->Value);
+        system(festival1_buffer);
+    )
         RecPrintDef (StackObject, CurrentNode->Left);
     }
     if (selection == 1)
     {
         fprintf(stdout, "%s, ", CurrentNode->Value);
+    ON_FESTIVAL(
+        char festival2_buffer[SIZE_OF_FESTIVAL] = {};
+        snprintf(festival2_buffer, SIZE_OF_FESTIVAL, ECHO "\"%s\"" FESTIVAL, CurrentNode->Value);
+        system(festival2_buffer);
+    )    
         RecPrintDef (StackObject, CurrentNode->Right);
     }
 }
@@ -465,11 +531,16 @@ void RecPrintDef (Stack_t* StackObject, Node_t* CurrentNode)
 EnumOfErrors CompareObjects (BinaryTree_t* myTree, Stack_t* StackObject1, Stack_t* StackObject2)
 {
     fprintf(stdout, CYAN "Введите два объекта и я выведу их общие и различные черты!\n");
-
+ON_FESTIVAL(
+    system(ECHO "\"Введите два объекта и я выведу их общие и различные черты!\"" FESTIVAL);
+)
     char object1_buffer[SIZE_OF_BUFFER] = {}; 
     int object1_ch = 0;
     size_t counter1_symbols = 0;
     fprintf(stdout, CYAN "Введите первый объект: " RESET);
+ON_FESTIVAL(
+    system(ECHO "\"Введите первый объект\"" FESTIVAL);
+)
     while ((object1_ch = getchar()) != '\n') 
     {
         object1_buffer[counter1_symbols] = object1_ch;
@@ -480,6 +551,9 @@ EnumOfErrors CompareObjects (BinaryTree_t* myTree, Stack_t* StackObject1, Stack_
     int object2_ch = 0;
     size_t counter2_symbols = 0;
     fprintf(stdout, CYAN "Введите второй объект: " RESET);
+ON_FESTIVAL(
+    system(ECHO "\"Введите второй объект\"" FESTIVAL);
+)
     while ((object2_ch = getchar()) != '\n') 
     {
         object2_buffer[counter2_symbols] = object2_ch;
@@ -491,11 +565,17 @@ EnumOfErrors CompareObjects (BinaryTree_t* myTree, Stack_t* StackObject1, Stack_
     if (!find_node1)
     {
         fprintf(stdout, YELLOW "Ваш первый объект не найден, убедитесь что вы правильно его ввели!\n");
+    ON_FESTIVAL(
+        system(ECHO "\"Ваш первый объект не найден убедитесь что вы правильно его ввели!\"" FESTIVAL);
+    )
         return ERR_OK;
     }
     if (!find_node2)
     {
         fprintf(stdout, YELLOW "Ваш второй объект не найден, убедитесь что вы правильно его ввели!\n");
+    ON_FESTIVAL(
+        system(ECHO "\"Ваш второй объект не найден убедитесь что вы правильно его ввели!\"" FESTIVAL);
+    )
         return ERR_OK;
     }
     //нашли узелы теперь идем к корню и заполняем стеки
@@ -509,6 +589,9 @@ EnumOfErrors CompareObjects (BinaryTree_t* myTree, Stack_t* StackObject1, Stack_
 void PrintComparing (Stack_t* StackObject1, Stack_t* StackObject2, BinaryTree_t* myTree)
 {
     fprintf(stdout, GREEN "Они оба: ");
+ON_FESTIVAL(
+    system(ECHO "\"Они оба\"" FESTIVAL);
+)
     RecPrintComparing(StackObject1, StackObject2, myTree->Root);
     fprintf(stdout, "\n" RESET);  
 }
@@ -525,11 +608,21 @@ void RecPrintComparing (Stack_t* StackObject1, Stack_t* StackObject2, Node_t* Cu
         if (selection1 == 0) 
         {
             fprintf(stdout, "не %s, ", CurrentNode->Value);
+        ON_FESTIVAL(
+            char festival_buffer[SIZE_OF_FESTIVAL] = {};
+            snprintf(festival_buffer, SIZE_OF_FESTIVAL, ECHO "\"не %s\"" FESTIVAL, CurrentNode->Value);
+            system(festival_buffer);
+        )
             RecPrintComparing (StackObject1, StackObject2,CurrentNode->Left);
         }
         if (selection1 == 1) 
         {
             fprintf(stdout, "%s, ", CurrentNode->Value);
+        ON_FESTIVAL(
+            char festival_buffer[SIZE_OF_FESTIVAL] = {};
+            snprintf(festival_buffer, SIZE_OF_FESTIVAL, ECHO "\"%s\"" FESTIVAL, CurrentNode->Value);
+            system(festival_buffer);
+        )
             RecPrintComparing (StackObject1, StackObject2, CurrentNode->Right);
         }
     }
@@ -537,8 +630,13 @@ void RecPrintComparing (Stack_t* StackObject1, Stack_t* StackObject2, Node_t* Cu
     if (selection1 != selection2)
     {
         fprintf(stdout, "\nНо они отличаются.\n");
-
+    ON_FESTIVAL(
+        system(ECHO "\"Но они отличаются\"" FESTIVAL);
+    )
         fprintf(stdout, "Первый объект отличается от второго тем, что он: ");
+    ON_FESTIVAL(
+        system(ECHO "\"Первый объект отличается от второго тем что он\"" FESTIVAL);
+    )
         if (selection1 == 0) 
         {
             fprintf(stdout, "не %s, ", CurrentNode->Value);
@@ -551,14 +649,27 @@ void RecPrintComparing (Stack_t* StackObject1, Stack_t* StackObject2, Node_t* Cu
         }        
         fprintf(stdout, "\n");
         fprintf(stdout, "Второй объект отличается от первого тем, что он: ");
+    ON_FESTIVAL(
+        system(ECHO "\"Второй объект отличается от первого тем что он\"" FESTIVAL);
+    )
         if (selection2 == 0) 
         {
             fprintf(stdout, "не %s, ", CurrentNode->Value);
+        ON_FESTIVAL(
+            char festival_buffer[SIZE_OF_FESTIVAL] = {};
+            snprintf(festival_buffer, SIZE_OF_FESTIVAL, ECHO "\"не %s\"" FESTIVAL, CurrentNode->Value);
+            system(festival_buffer);
+        )
             RecPrintDef (StackObject2, CurrentNode->Left);
         }
         else
         {
             fprintf(stdout, "%s, ", CurrentNode->Value);
+        ON_FESTIVAL(
+            char festival_buffer[SIZE_OF_FESTIVAL] = {};
+            snprintf(festival_buffer, SIZE_OF_FESTIVAL, ECHO "\"%s\"" FESTIVAL, CurrentNode->Value);
+            system(festival_buffer);
+        )
             RecPrintDef (StackObject2, CurrentNode->Right);
         }
 
@@ -583,6 +694,9 @@ EnumOfErrors UploadDataBase (BinaryTree_t* myTree, const char* file_database)
     if (*text_buffer == '\0') 
     {
         fprintf(stdout, YELLOW "База данных пуста!\n" RESET);
+    ON_FESTIVAL(
+        system(ECHO "\"База данных пуста\"" FESTIVAL);
+    )
         return ERR_OK;
     }
 
@@ -727,6 +841,11 @@ void ShowTree (BinaryTree_t* myTree)
 
     system ("dot " SHOW_GRAPH_FILE " -T " SHOW_GRAPH_TYPE " -o " SHOW_GRAPH_IMAGE);
     system ("rm " SHOW_GRAPH_FILE);
+
+    fprintf(stdout, CYAN "Сделано!\n" RESET);
+ON_FESTIVAL(
+    system(ECHO "\"Сделано!\"" FESTIVAL);
+)
 }
 
 void ShowWriteNode (Node_t* CurrentNode)

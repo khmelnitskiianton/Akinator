@@ -1,7 +1,7 @@
 # Akinator
 
 This is cool program that can generate data base on binary tree (yes/no)
-You can upload data, guess elements or add them, see data(or log), take definition or compare objects, and save data!
+You can upload data, guess elements or add them, see data(or log), take definition or compare objects, and save data, and vocalize all text with Festival!
 
 - [Introduction](#inroduction)
 - [Commands and options](#commands_and_options)
@@ -14,32 +14,43 @@ You can upload data, guess elements or add them, see data(or log), take definiti
 
 To start program you need to use CMake and run program
 
-1. Clone repository:
+1.  Clone repository:
 
     ```c
     $ git clone https://github.com/khmelnitskiianton/Akinator.git
     ```
 
-2. Compile CMake, write command in main directory in repo:
+2.  Compile CMake, write command in main directory in repo:
 
     ```c
     $ cmake .
     ```
 
-3. Run CMake (compile program), write command in main directory in repo:
+3.  Run CMake (compile program), write command in main directory in repo:
 
     ```c
     $ make
     ```
 
-4. Run program:
+4.  Run program:
 
     ```c
     $ ./akinator.exe <file_to_save_data_base>.txt
     ```
     (before you need to create this file)
 
-5.  Answer questions and work(or have fun) with Akinator!!!
+5.  Program use voice overing with festival!
+    You can turn it off, undef `INCLUDE_FESTIVAL` in `./hdr/func.h`
+    -   If you have Linux install it:
+        ```c
+        $ sudo apt install festival festvox-ru 
+        ```
+    -   If you have Windows maybe you can install it, but easily use Linux
+    -   If you have WSL may God help you
+        Take a chance with this guide `https://research.wmz.ninja/articles/2017/11/setting-up-wsl-with-graphics-and-audio.html`
+        If any errors search them in internet (I spent 2 days to connect audio in WSL with Windows with PulseAudio)
+
+6. Answer questions and work(or have fun) with Akinator!!!
 
 # Commands and options
 
@@ -71,6 +82,7 @@ Thats all about working with Akinator!
 
 ## Options of compiling
 
+INCLUDE_FESTIVAL
 DEBUG_LOG
 DEBUG_MYASSERT
 DEBUG_VERIFY
