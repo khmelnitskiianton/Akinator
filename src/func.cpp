@@ -231,10 +231,10 @@ ON_FESTIVAL(
             int buff_ch = 0; 
             size_t counter_symbols = 0;
             
-            while ((buff_ch = getchar()) != '\n') 
+            while ((buff_ch = getchar()) != '\n')
             {
-                buffer[counter_symbols] = buff_ch;
-                counter_symbols++;
+                MYASSERT(counter_symbols < SIZE_OF_BUFFER, ERR_OVERFLOW_VALUE, return ERR_OVERFLOW_VALUE)
+                buffer[counter_symbols++] = buff_ch;
             }
             buff_ch = 0;
             counter_symbols = 0;
@@ -299,24 +299,21 @@ ON_FESTIVAL(
     buff[strlen(buff)-1] = '\0';
     while (true)
     {
-        if (!strncmp(buff, "У", 2) || !strncmp(buff, "у", 2)) break;        //TODO: убрать копипаст
-        if (!strncmp(buff, "Д", 2) || !strncmp(buff, "д", 2)) break;
-        if (!strncmp(buff, "С", 2) || !strncmp(buff, "с", 2)) break;
-        if (!strncmp(buff, "П", 2) || !strncmp(buff, "п", 2)) break;
-        if (!strncmp(buff, "В", 2) || !strncmp(buff, "в", 2)) break;
-        if (!strncmp(buff, "Б", 2) || !strncmp(buff, "б", 2)) break;
+        if (RUS_TO_UPPER(buff, "У", "у")) return "У";
+        if (RUS_TO_UPPER(buff, "Д", "д")) return "Д";
+        if (RUS_TO_UPPER(buff, "С", "с")) return "С";
+        if (RUS_TO_UPPER(buff, "П", "п")) return "П";
+        if (RUS_TO_UPPER(buff, "В", "в")) return "В";
+        if (RUS_TO_UPPER(buff, "Б", "б")) return "Б";
         fprintf (stdout,  RED "Я не понял команду :(\n" RESET);
+    ON_FESTIVAL(
+        system(ECHO "Я не понял команду" FESTIVAL);
+    )
         CleanCharBuffer(buff, SIZE_OF_BUFFER);
         fgets(buff, SIZE_OF_BUFFER, stdin);
     }
-    if (!strncmp(buff, "У", 2) || !strncmp(buff, "у", 2)) return "У";
-    if (!strncmp(buff, "Д", 2) || !strncmp(buff, "д", 2)) return "Д";
-    if (!strncmp(buff, "С", 2) || !strncmp(buff, "с", 2)) return "С";
-    if (!strncmp(buff, "П", 2) || !strncmp(buff, "п", 2)) return "П";
-    if (!strncmp(buff, "В", 2) || !strncmp(buff, "в", 2)) return "В";
-    if (!strncmp(buff, "Б", 2) || !strncmp(buff, "б", 2)) return "Б";
-    clean_buffer();
     MYASSERT(0, ERR_BAD_ANSWER, return 0)
+    return NULL;
 }
 
 EnumOfErrors AkinatorWork(BinaryTree_t* myTree, Stack_t* StackObject1, Stack_t* StackObject2, const char* file_database)
@@ -685,12 +682,13 @@ EnumOfErrors UploadDataBase (BinaryTree_t* myTree, const char* file_database)
     FILE* FileRead = OpenFile (file_database, "r");
 
     size_t size_text = FileSize (FileRead);
-    size_t n_strings = 0;
 
     char* text_buffer = NULL;
     text_buffer = (char*) calloc (size_text, sizeof (char));
     MYASSERT(text_buffer, ERR_BAD_CALLOC, return ERR_BAD_CALLOC)
-    fread (text_buffer, 1, size_text, FileRead);
+    size_t result_size = fread (text_buffer, 1, size_text, FileRead);
+
+    MYASSERT(result_size == size_text, ERR_BAD_FREAD, return ERR_BAD_FREAD);
 
     if (*text_buffer == '\0') 
     {
@@ -704,16 +702,7 @@ EnumOfErrors UploadDataBase (BinaryTree_t* myTree, const char* file_database)
 	*(text_buffer + size_text - 1) = '\0';
     CloseFile (FileRead);
 
-    n_strings = 0; //считаем узлы
-	for (size_t i = 0; i < (size_text); i++)
-    {
-        if ((*(text_buffer + i) == '[') || (*(text_buffer + i) == '\0'))
-        {
-            n_strings += 1;
-        }
-    }
-
-    RecScanData(text_buffer, 0, myTree->Root, myTree);
+    RecScanData(text_buffer, NULL, myTree->Root, myTree);
 
     free(text_buffer);
 
@@ -730,7 +719,7 @@ size_t FileSize (FILE *file_text)
 	return size_text;
 }
 
-EnumOfErrors RecScanData(const char* text_buffer, bool LeftRight, Node_t* CurrentNode, BinaryTree_t* myTree)
+EnumOfErrors RecScanData(const char* text_buffer, Node_t** ResNode, Node_t* CurrentNode, BinaryTree_t* myTree)
 {
     position = SkipSpaces (position, text_buffer); //пропускаем пробелы
     if (!strncmp(text_buffer + position, "nil", 3))
@@ -772,18 +761,17 @@ EnumOfErrors RecScanData(const char* text_buffer, bool LeftRight, Node_t* Curren
         NewNode->Parent = CurrentNode;//подвязка от предыдущего
         if (CurrentNode)//проверка на корень
         {
-            if (LeftRight == 0) CurrentNode->Left = NewNode;
-            else                CurrentNode->Right = NewNode;
+            *ResNode = NewNode;
         }
         else
         {
             myTree->Root = NewNode;
         }
         //Далее рекурсивно идем дальше
-        EnumOfErrors result = ERR_OK;
-        result = RecScanData(text_buffer, 0, NewNode, myTree);
+        EnumOfErrors result = ERR_OK;   
+        result = RecScanData(text_buffer, &NewNode->Left, NewNode, myTree);
         MYASSERT(result == ERR_OK, ERR_BAD_REC_SCAN, return ERR_BAD_REC_SCAN);
-        result = RecScanData(text_buffer, 1, NewNode, myTree);
+        result = RecScanData(text_buffer, &NewNode->Right, NewNode, myTree);
         MYASSERT(result == ERR_OK, ERR_BAD_REC_SCAN, return ERR_BAD_REC_SCAN);
         position = SkipSpaces (position, text_buffer);
         if (*(text_buffer + position) == ')')

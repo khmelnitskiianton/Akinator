@@ -12,6 +12,8 @@ const char UNKNOWN_OBJECT[] = "неизвестно кто";
 #define SHOW_GRAPH_IMAGE "show_graph.png"
 #define SHOW_GRAPH_TYPE "png"
 
+#define RUS_TO_UPPER(str_buff, up_str, low_str) (!strncmp(str_buff, up_str, 2) || !strncmp(str_buff, low_str, 2))
+
 struct Line {
     size_t len;
 
@@ -61,7 +63,7 @@ void PrintPostNode (Node_t* CurrentNode, FILE* filestream);
 
 //Подгрузка базы данных
 EnumOfErrors UploadDataBase (BinaryTree_t* myTree, const char* file_database);
-EnumOfErrors RecScanData(const char* text_buffer, bool LeftRight, Node_t* CurrentNode, BinaryTree_t* myTree);
+EnumOfErrors RecScanData(const char* text_buffer, Node_t** ResNode, Node_t* CurrentNode, BinaryTree_t* myTree);
 size_t SkipSpaces(size_t position, const char* text_buffer);
 //--------------------------------------------------------------------------------------
 
