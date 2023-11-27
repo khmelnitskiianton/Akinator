@@ -40,7 +40,7 @@ To start program you need to use CMake and run program
     (before you need to create this file)
 
 5.  Program use voice overing with festival!
-    You can turn it off, undef `INCLUDE_FESTIVAL` in `./hdr/func.h`
+    You can turn it off, undef `INCLUDE_FESTIVAL` in `./hdr/festival.h`
     -   If you have Linux install it:
         ```c
         $ sudo apt install festival festvox-ru 
@@ -49,17 +49,18 @@ To start program you need to use CMake and run program
     -   If you have WSL may God help you
         Take a chance with this guide `https://research.wmz.ninja/articles/2017/11/setting-up-wsl-with-graphics-and-audio.html`
         If any errors search them in internet (I spent 2 days to connect audio in WSL with Windows with PulseAudio)
+        Start Pulse Audio on Win with flags `$ pulseaudio.exe --use-pid-file=false -D` (but its some peculiarity, check `https://github.com/aseering/wsl_gui_autoinstall/issues/8`)
 
 6. Answer questions and work(or have fun) with Akinator!!!
 
 # Commands and options
 
 0.  First program ask you about uploading data base from file
-    Write `Y/N` to do it or don't.
+    Write `Д/Н` to do it or don't.
 
 1. `[У]гадать` You need to write `У`
     This command guessing your object, while asking questions.
-    Answer `Y/N`.
+    Answer `Д/Н`.
     If object doesn't exist Akinator ask you to add object and it difference (So you can add objects like this).
 
 2. `[Д]ать определение` You nees to write `Д`

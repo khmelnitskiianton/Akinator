@@ -14,6 +14,7 @@
 #include "func.h"
 #include "stack_base.h"
 #include "stack_support.h"
+#include "festival.h"
 
 static FILE* ShowGraphFile = NULL;
 static size_t position = 0;
@@ -244,8 +245,8 @@ ON_FESTIVAL(
             //отличие
             fprintf(stdout, CYAN "А чем %s отличается от %s ?\nЭто..." RESET, NewObjectNode->Value, CurrentNode->Value); //Создаем новое определение
     ON_FESTIVAL(         
-            char festival3_buffer[SIZE_OF_FESTIVAL] = {};
-            snprintf(festival3_buffer, SIZE_OF_FESTIVAL, ECHO "\"А чем %s отличается от %s Это\"" FESTIVAL, NewObjectNode->Value, CurrentNode->Value);
+            char festival3_buffer[2*SIZE_OF_FESTIVAL] = {};
+            snprintf(festival3_buffer, 2*SIZE_OF_FESTIVAL, ECHO "\"А чем %s отличается от %s Это\"" FESTIVAL, NewObjectNode->Value, CurrentNode->Value);
             system(festival3_buffer);
     )        
             while ((buff_ch = getchar()) != '\n') 

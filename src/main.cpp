@@ -10,6 +10,7 @@
 #include "myassert.h"
 #include "stack_base.h"
 #include "stack_support.h"
+#include "festival.h"
 
 int main(int argc, char *argv[])
 {
@@ -18,9 +19,11 @@ int main(int argc, char *argv[])
     {
         printf(GREEN "\n<<<Файл для сохранения базы данных: %s>\n" RESET, argv[1]);
     }
-
+    
+ON_FESTIVAL(
     fprintf(stdout, GREEN "\nЗагрузка...\n" RESET);
-
+    system(ECHO "Загрузка" FESTIVAL);
+)
     BinaryTree_t myTree = {};
     Stack_t StackObject1 = {};    
     Stack_t StackObject2 = {};
@@ -34,14 +37,18 @@ int main(int argc, char *argv[])
     fprintf(stdout, GREEN "Загрузка завершена!\n\n" RESET);
     
     fprintf(stdout, GREEN "Загрузить старую базу данных?\n" RESET);
+ON_FESTIVAL(
     system(ECHO "Загрузить старую базу данных?" FESTIVAL);
+)    
     int choice = UserChoice();
     if (choice == 'Y')
     {
         fprintf(stdout, GREEN "Загрузка базы данных...\n" RESET);
         UploadDataBase(&myTree, argv[1]);
         fprintf(stdout, GREEN "Загрузка базы данных завершена!\n\n" RESET);
+ON_FESTIVAL(
         system(ECHO "Загрузка базы данных завершена!" FESTIVAL);
+)    
     }   
 
 //Подгрузка БД

@@ -3,14 +3,6 @@
 
 #include "errors_enum.h"
 
-#define INCLUDE_FESTIVAL 1
-
-#ifdef INCLUDE_FESTIVAL
-    #define ON_FESTIVAL(...) __VA_ARGS__
-#else
-    #define ON_FESTIVAL(...) 
-#endif
-
 const size_t SIZE_OF_BUFFER = 500;
 const int DONE = 1;
 const int ERROR = 0;
@@ -19,9 +11,6 @@ const char UNKNOWN_OBJECT[] = "неизвестно кто";
 #define SHOW_GRAPH_FILE "show_graph.dot"
 #define SHOW_GRAPH_IMAGE "show_graph.png"
 #define SHOW_GRAPH_TYPE "png"
-
-#define ECHO "echo "
-#define FESTIVAL " | festival --tts"
 
 struct Line {
     size_t len;
