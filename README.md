@@ -11,43 +11,29 @@ You can upload data, guess elements or add them, see data(or log), take definiti
 - [Commands and options](#commands-and-options)
 - [Options of compiling](#options-of-compiling)
 - [Myassert](#myassert)
-- [Veryficator](#verificator)
+- [Verificator](#verificator)
 - [Logs](#logs)
 
 ## Installation
 
 To start program you need to use CMake and run program
 
-1.  Clone repository:
-
-    ```c
-    $ git clone https://github.com/khmelnitskiianton/Akinator.git
-    ```
-
-2.  Compile CMake, write command in main directory in repo:
-
-    ```c
-    $ cmake .
-    ```
-
-3.  Run CMake (compile program), write command in main directory in repo:
-
-    ```c
-    $ make
-    ```
-
-4.  Run program:
-
-    ```c
-    $ ./akinator.exe <file_to_save_data_base>.txt
-    ```
-    (before you need to create this file)
-
-6. Answer questions and work(or have fun) with Akinator!!! 
+1.  Clone repository
+2.  Compile CMake, write command in main directory in repo
+3.  Run CMake (compile program), write command in main directory in repo
+4.  Run program(before you need to create this file) 
+```c
+git clone https://github.com/khmelnitskiianton/Akinator.git
+cd ./Akinator
+cmake .
+make
+./akinator.exe <file_to_save_data_base>.txt
+```
+5. Answer questions and work(or have fun) with Akinator!!! 
 
 ## Extra programs
 
-1.  Logs useing Graphviz to vizualize binary tree!(you can turn them off) 
+1.  Logs using Graphviz to vizualize binary tree!(you can turn them off) 
     ```c
     $ sudo apt install graphviz
     ```
