@@ -14,12 +14,6 @@ const char UNKNOWN_OBJECT[] = "неизвестно кто";
 
 #define RUS_TO_UPPER(str_buff, up_str, low_str) (!strncmp(str_buff, up_str, 2) || !strncmp(str_buff, low_str, 2))
 
-struct Line {
-    size_t len;
-
-    char* start_line;
-};
-
 //база
 void         TreeCtor   (BinaryTree_t* myTree);
 EnumOfErrors TreeDtor   (BinaryTree_t* myTree);

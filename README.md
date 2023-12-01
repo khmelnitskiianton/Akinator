@@ -109,7 +109,7 @@ DEBUG_VERIFY
 
 `myassert.h`
 
-Now it relized like MYASSERT() that take all errors with enum and write it to console
+Now it realized like MYASSERT() that take all errors with enum and write it to console
 
 ## Verificator
 

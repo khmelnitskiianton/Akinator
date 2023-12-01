@@ -748,6 +748,7 @@ EnumOfErrors RecScanData(const char* text_buffer, Node_t** ResNode, Node_t* Curr
         size_t shift = 0;
         while (*(text_buffer + position) != ']') 
         {
+            MYASSERT(shift < strlen(text_buffer), ERR_OVERFLOW_BUFF, return ERR_OVERFLOW_BUFF)
             *(object_buffer + shift) = *(text_buffer + position);
             shift++;
             position++;
